@@ -1,7 +1,9 @@
 const db = require("./database/db.js");
 
 const select_cohorts_in_finsbo = db.prepare(/*sql*/ `
-  -- [1]
+  SELECT name
+  FROM cohorts
+  WHERE location = 'Finsbury Park'
 `);
 
 function listCohortsInFinsbo() {
@@ -9,7 +11,11 @@ function listCohortsInFinsbo() {
 }
 
 const select_students_in_finsbo = db.prepare(/*sql*/ `
-  -- [2]
+SELECT username
+FROM students
+JOIN cohorts
+ON cohorts.name = students.cohort_name
+WHERE location = 'Finsbury Park'
 `);
 
 function listStudentsInFinsbo() {
@@ -17,7 +23,10 @@ function listStudentsInFinsbo() {
 }
 
 const select_students_with_location = db.prepare(/*sql*/ `
-  -- [3]
+SELECT s.username, c.location
+FROM students AS s
+JOIN cohorts AS c
+ON c.name = s.cohort_name
 `);
 
 function listStudentsWithLocation() {
@@ -25,7 +34,10 @@ function listStudentsWithLocation() {
 }
 
 const select_students_with_projects = db.prepare(/*sql*/ `
-  -- [4]
+SELECT p.name, sp.student_username AS username
+FROM students_projects AS sp
+JOIN projects AS p
+ON sp.project_id = p.id
 `);
 
 function listStudentsWithProjects() {
@@ -33,7 +45,16 @@ function listStudentsWithProjects() {
 }
 
 const select_students_with_projects_in_finsbo = db.prepare(/*sql*/ `
-  -- [5]
+SELECT p.name, sp.student_username AS username
+FROM students_projects AS sp
+JOIN projects AS p
+ON sp.project_id = p.id
+JOIN cohorts AS c
+ON c.name = s.cohort_name
+JOIN students AS s
+ON s.username = sp.student_username
+WHERE c.location = 'Finsbury Park'
+ORDER BY sp.student_username
 `);
 
 function listStudentsWithProjectsInFinsbo() {
